@@ -1,5 +1,5 @@
 export interface NestBrokerOptions {
   url: string;
   type: string;
-  service: string;
+  service?: string;
 }
