@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "NestJS module to produce and consume messages with the broker of your choice. From the BrioHR team.",
   "author": "Benjamin Bellantonio",
+  "homepage": "https://github.com/BrioHR/nest-broker",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
