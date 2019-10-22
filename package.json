@@ -1,6 +1,6 @@
 {
   "name": "@briohr/nest-broker",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "NestJS module to produce and consume messages with the broker of your choice. From the BrioHR team.",
   "author": "Benjamin Bellantonio",
   "homepage": "https://github.com/BrioHR/nest-broker",

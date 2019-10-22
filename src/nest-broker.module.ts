@@ -1,11 +1,12 @@
 import { DiscoveryModule, DiscoveryService } from "@nestjs-plus/discovery";
 import { DynamicModule, Global, Module, OnModuleInit, Provider } from "@nestjs/common";
+import { ExternalContextCreator } from "@nestjs/core/helpers/external-context-creator";
 import { BROKER_SUBSCRIBE, NEST_BROKER_OPTIONS } from "./constants";
 import {
   DecoratorMetadataConfiguration,
   NestBrokerAsyncOptions,
   NestBrokerOptions,
-  NestBrokerOptionsFactory,
+  NestBrokerOptionsFactory
 } from "./interfaces";
 import { createNestBrokerProviders } from "./nest-broker.providers";
 import { NestBrokerService } from "./nest-broker.service";
@@ -14,21 +15,27 @@ import { NestBrokerService } from "./nest-broker.service";
 @Module({
   imports: [DiscoveryModule],
   providers: [NestBrokerService],
-  exports: [NestBrokerService],
+  exports: [NestBrokerService]
 })
 export class NestBrokerModule implements OnModuleInit {
-  public static register(options: NestBrokerOptions): DynamicModule {
-    return {
-      module: NestBrokerModule,
-      providers: createNestBrokerProviders(options),
-    };
-  }
+  constructor(
+    private readonly brokerService: NestBrokerService,
+    private readonly discover: DiscoveryService,
+    private readonly externalContextCreator: ExternalContextCreator
+  ) {}
 
   public static registerAsync(options: NestBrokerAsyncOptions): DynamicModule {
     return {
       module: NestBrokerModule,
       imports: options.imports || [],
       providers: [...this.createProviders(options)]
+    };
+  }
+
+  public static register(options: NestBrokerOptions): DynamicModule {
+    return {
+      module: NestBrokerModule,
+      providers: createNestBrokerProviders(options)
     };
   }
 
@@ -41,8 +48,8 @@ export class NestBrokerModule implements OnModuleInit {
       this.createOptionsProvider(options),
       {
         provide: options.useClass,
-        useClass: options.useClass,
-      },
+        useClass: options.useClass
+      }
     ];
   }
 
@@ -51,7 +58,7 @@ export class NestBrokerModule implements OnModuleInit {
       return {
         provide: NEST_BROKER_OPTIONS,
         useFactory: options.useFactory,
-        inject: options.inject || [],
+        inject: options.inject || []
       };
     }
 
@@ -59,14 +66,9 @@ export class NestBrokerModule implements OnModuleInit {
       provide: NEST_BROKER_OPTIONS,
       useFactory: async (optionsFactory: NestBrokerOptionsFactory) =>
         optionsFactory.createNestBrokerOptions(),
-      inject: [options.useExisting || options.useClass],
+      inject: [options.useExisting || options.useClass]
     };
   }
-
-  constructor(
-    private readonly brokerService: NestBrokerService,
-    private readonly discover: DiscoveryService,
-  ) {}
 
   public async onModuleInit() {
     await this.registerSubscribers();
@@ -78,7 +80,12 @@ export class NestBrokerModule implements OnModuleInit {
     >(BROKER_SUBSCRIBE);
 
     for (const provider of providers) {
-      this.brokerService.subscribe(provider.meta.topic, provider.meta.callback);
+      const callback = this.externalContextCreator.create(
+        provider.discoveredMethod.parentClass.instance,
+        provider.discoveredMethod.handler,
+        provider.discoveredMethod.methodName
+      );
+      this.brokerService.subscribe(provider.meta.topic, callback);
     }
   }
 }

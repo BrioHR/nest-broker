@@ -10,7 +10,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
         connection.createChannel().then(async (channel: any) => {
           return Promise.all([
             channel.assertExchange(topic, "fanout"),
-            channel.publish(topic, "", Buffer.from(JSON.stringify(content))),
+            channel.publish(topic, "", Buffer.from(JSON.stringify(content)))
           ]);
         });
       });
@@ -27,7 +27,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
             channel.assertQueue(topic),
             channel.assertExchange(exchange, "fanout"),
             channel.bindQueue(topic, exchange),
-            channel.consume(topic, msg => {
+            channel.consume(topic, async msg => {
               if (msg !== null) {
                 try {
                   callback(JSON.parse(msg.content.toString()));
@@ -37,7 +37,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
                   channel.reject();
                 }
               }
-            }),
+            })
           ]);
         });
       });

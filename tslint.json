@@ -15,7 +15,19 @@
     "member-ordering": [
       true,
       {
-        "order": "statics-first"
+        "order": [
+          "public-static-field",
+          "private-static-field",
+          "public-instance-field",
+          "private-instance-field",
+          "public-constructor",
+          "private-constructor",
+          "public-static-method",
+          "private-static-method",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
       }
     ],
     "no-consecutive-blank-lines": true,
