@@ -27,7 +27,8 @@ export class NestBrokerModule implements OnModuleInit {
   public static registerAsync(options: NestBrokerAsyncOptions): DynamicModule {
     return {
       module: NestBrokerModule,
-      providers: [...this.createProviders(options)],
+      imports: options.imports || [],
+      providers: [...this.createProviders(options)]
     };
   }
 
