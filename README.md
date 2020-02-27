@@ -56,7 +56,8 @@ NestBrokerModule.registerAsync({
   useFactory: async (configService: ConfigService) => ({
     url: configService.getString('BROKER_URL'),
     type: BROKER_TYPE_RABBIT,
-    service: 'serviceName'
+    service: 'serviceName',
+    logger: new MyLogger()
   }),
   inject: [ConfigService],
 }),
@@ -126,6 +127,7 @@ The `NestBrokerModule` takes an `options` object:
 - `url` is a string, and this is the url to your broker
 - `type` is a constant from this module, so you can set the broker type
 - `service` is a string, and optional, it's used in case you have multiple service and you want to subscribe them all to the same topic (required for RabbitMQ)
+- `logger` is an instance of a custom NestJS Logger, and optional
 
 #### Informations about RabbitMQ implementation
 
