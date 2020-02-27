@@ -1,7 +1,7 @@
-// tslint:disable: variable-name
 import { Inject, Injectable, Logger } from "@nestjs/common";
+
 import { BrokerFactory } from "./adapters/broker-adapter.factory";
-import { NEST_BROKER_OPTIONS } from "./constants";
+import { NEST_BROKER_OPTIONS, MODULE_NAME } from "./constants";
 import { NestBrokerOptions } from "./interfaces";
 
 interface INestBrokerService {
@@ -13,7 +13,7 @@ interface INestBrokerService {
 export class NestBrokerService implements INestBrokerService {
   private readonly logger: Logger;
   constructor(@Inject(NEST_BROKER_OPTIONS) private _NestBrokerOptions: NestBrokerOptions) {
-    this.logger = new Logger("NestBrokerService");
+    this.logger = new Logger(MODULE_NAME);
     this.logger.log(`Options: ${JSON.stringify(this._NestBrokerOptions)}`);
   }
 

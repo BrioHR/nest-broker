@@ -4,7 +4,7 @@ import { RabbitMQAdapter } from "./rabbitmq.adapter";
 
 export class BrokerFactory {
   public static getInstance(options: NestBrokerOptions): BrokerAdapterInterface {
-    return new RabbitMQAdapter(options.url, options.service);
+    return new RabbitMQAdapter(options.url, options.service, options.logger);
     /*
     TODO switch type load specific adapter
     switch (type) {
