@@ -42,14 +42,14 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
           })
           .then(async (channel: any) => {
             const exchange = topic;
-            topic = `${this.service}_${topic}`;
+            const queue = `${this.service}_${topic}`;
 
             return Promise.all([
-              channel.assertQueue(topic),
+              channel.assertQueue(queue),
               channel.assertExchange(exchange, "fanout"),
-              channel.bindQueue(topic, exchange),
-              channel.consume(topic, async msg => {
-                this.logger.log(`Consume ${topic} ${msg.content.toString()}`);
+              channel.bindQueue(queue, exchange),
+              channel.consume(queue, async msg => {
+                this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
                 if (msg !== null) {
                   try {
                     callback(JSON.parse(msg.content.toString()));
