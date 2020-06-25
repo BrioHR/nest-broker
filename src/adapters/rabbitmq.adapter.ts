@@ -78,6 +78,8 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
       conn.on("error", err => {
         if (err.message !== "Connection closing") {
           this.logger.error("[AMQP] conn error", err.message);
+
+          return setTimeout(() => this.connect(url, callback), 3000);
         }
       });
       conn.on("close", () => {
