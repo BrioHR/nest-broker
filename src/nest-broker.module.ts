@@ -1,5 +1,11 @@
 import { DiscoveryModule, DiscoveryService } from "@nestjs-plus/discovery";
-import { DynamicModule, Global, Module, OnModuleInit, Provider } from "@nestjs/common";
+import {
+  DynamicModule,
+  Global,
+  Module,
+  OnModuleInit,
+  Provider
+} from "@nestjs/common";
 import { ExternalContextCreator } from "@nestjs/core/helpers/external-context-creator";
 import { BROKER_SUBSCRIBE, NEST_BROKER_OPTIONS } from "./constants";
 import {
@@ -53,7 +59,9 @@ export class NestBrokerModule implements OnModuleInit {
     ];
   }
 
-  private static createOptionsProvider(options: NestBrokerAsyncOptions): Provider {
+  private static createOptionsProvider(
+    options: NestBrokerAsyncOptions
+  ): Provider {
     if (options.useFactory) {
       return {
         provide: NEST_BROKER_OPTIONS,
