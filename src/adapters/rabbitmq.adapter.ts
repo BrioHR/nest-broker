@@ -47,29 +47,26 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
     const exchange = topic;
     const queue = `${this.service}_${topic}`;
 
-    const subscriberChannel = this.connection.createChannel({
+    this.connection.createChannel({
       json: true,
       setup: channel => {
         return Promise.all([
           channel.assertQueue(queue, { durable: true }),
           channel.assertExchange(exchange, "fanout"),
-          channel.bindQueue(queue, exchange)
-        ]);
+          channel.bindQueue(queue, exchange),
+          channel.consume(queue, async msg => {
+            this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
+            if (msg !== null) {
+              try {
+                callback(JSON.parse(msg.content.toString()));
+                channel.ack(msg);
+              } catch (e) {
+                channel.reject();
+              }
+            }
+          })
+        ]).catch(e => this.logger.error(e));
       }
-    });
-
-    subscriberChannel.addSetup(async channel => {
-      channel.consume(queue, async msg => {
-        this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
-        if (msg !== null) {
-          try {
-            callback(JSON.parse(msg.content.toString()));
-            channel.ack(msg);
-          } catch (e) {
-            channel.reject();
-          }
-        }
-      });
     });
   }
 }
