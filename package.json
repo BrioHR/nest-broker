@@ -24,7 +24,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@nestjs/common": "^6.0.0"
+    "@nestjs/common": "^9.2.1"
   },
   "dependencies": {
     "@nestjs-plus/discovery": "^2.0.2",
@@ -32,7 +32,7 @@
     "amqplib": "^0.10.3"
   },
   "devDependencies": {
-    "@nestjs/common": "^6.0.0",
+    "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^6.0.0",
     "@nestjs/platform-express": "^6.0.0",
     "@nestjs/testing": "6.1.1",
