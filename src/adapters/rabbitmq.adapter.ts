@@ -47,8 +47,6 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
       prefetch = 0;
     }
 
-    console.log(topic, { prefetch });
-
     this.connection.createChannel({
       json: true,
       setup: channel => {
@@ -61,7 +59,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
             this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
             if (msg !== null) {
               try {
-                callback(JSON.parse(msg.content.toString()));
+                await callback(JSON.parse(msg.content.toString()));
                 channel.ack(msg);
               } catch (e) {
                 channel.reject();
