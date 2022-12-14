@@ -8,11 +8,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
   private connection: any; // TODO, need types
   private publishChannelWrapper: any; // TODO, need types
 
-  constructor(
-    private url: string,
-    private service: string,
-    customLogger?: Logger
-  ) {
+  constructor(private url: string, private service: string, customLogger?: Logger) {
     this.logger = new Logger(MODULE_NAME);
     if (customLogger) {
       this.logger = customLogger;
@@ -42,10 +38,16 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
 
   public async subscribe(
     topic: string,
+    prefetch: number,
     callback: (message: string) => void
   ): Promise<void> {
     const exchange = topic;
     const queue = `${this.service}_${topic}`;
+    if (!prefetch) {
+      prefetch = 0;
+    }
+
+    console.log(topic, { prefetch });
 
     this.connection.createChannel({
       json: true,
@@ -53,6 +55,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
         return Promise.all([
           channel.assertQueue(queue, { durable: true }),
           channel.assertExchange(exchange, "fanout"),
+          channel.prefetch(prefetch),
           channel.bindQueue(queue, exchange),
           channel.consume(queue, async msg => {
             this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
