@@ -30,17 +30,12 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
   public async publish(topic: string, content: {}): Promise<void> {
     this.logger.log(`Publish ${topic} ${JSON.stringify(content)}`);
 
-    await Promise.all([
-      this.publishChannelWrapper.assertExchange(topic, "fanout"),
-      this.publishChannelWrapper.publish(topic, "", content)
-    ]).catch(e => this.logger.error(e));
+    await Promise.all([this.publishChannelWrapper.assertExchange(topic, "fanout"), this.publishChannelWrapper.publish(topic, "", content)]).catch(e =>
+      this.logger.error(e)
+    );
   }
 
-  public async subscribe(
-    topic: string,
-    prefetch: number,
-    callback: (message: string) => void
-  ): Promise<void> {
+  public async subscribe(topic: string, prefetch: number, callback: (message: string) => void | Promise<void>): Promise<void> {
     const exchange = topic;
     const queue = `${this.service}_${topic}`;
     if (!prefetch) {
@@ -58,11 +53,15 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
           channel.consume(queue, async msg => {
             this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
             if (msg !== null) {
-              try {
-                await callback(JSON.parse(msg.content.toString()));
-                channel.ack(msg);
-              } catch (e) {
-                channel.reject();
+              if (callback["contructor"] === "AsyncFunction") {
+                (callback(JSON.parse(msg.content.toString())) as Promise<void>).then(() => channel.ack(msg)).catch(() => channel.reject());
+              } else {
+                try {
+                  callback(JSON.parse(msg.content.toString()));
+                  channel.ack(msg);
+                } catch (e) {
+                  channel.reject();
+                }
               }
             }
           })

@@ -2,12 +2,7 @@ import { DiscoveryModule, DiscoveryService } from "@nestjs-plus/discovery";
 import { DynamicModule, Global, Module, OnModuleInit, Provider } from "@nestjs/common";
 import { ExternalContextCreator } from "@nestjs/core/helpers/external-context-creator";
 import { BROKER_SUBSCRIBE, NEST_BROKER_OPTIONS } from "./constants";
-import {
-  DecoratorMetadataConfiguration,
-  NestBrokerAsyncOptions,
-  NestBrokerOptions,
-  NestBrokerOptionsFactory
-} from "./interfaces";
+import { DecoratorMetadataConfiguration, NestBrokerAsyncOptions, NestBrokerOptions, NestBrokerOptionsFactory } from "./interfaces";
 import { createNestBrokerProviders } from "./nest-broker.providers";
 import { NestBrokerService } from "./nest-broker.service";
 
@@ -64,8 +59,7 @@ export class NestBrokerModule implements OnModuleInit {
 
     return {
       provide: NEST_BROKER_OPTIONS,
-      useFactory: async (optionsFactory: NestBrokerOptionsFactory) =>
-        optionsFactory.createNestBrokerOptions(),
+      useFactory: async (optionsFactory: NestBrokerOptionsFactory) => optionsFactory.createNestBrokerOptions(),
       inject: [options.useExisting || options.useClass]
     };
   }
@@ -75,9 +69,7 @@ export class NestBrokerModule implements OnModuleInit {
   }
 
   private async registerSubscribers() {
-    const providers = await this.discover.providerMethodsWithMetaAtKey<
-      DecoratorMetadataConfiguration
-    >(BROKER_SUBSCRIBE);
+    const providers = await this.discover.providerMethodsWithMetaAtKey<DecoratorMetadataConfiguration>(BROKER_SUBSCRIBE);
 
     for (const provider of providers) {
       const callback = this.externalContextCreator.create(

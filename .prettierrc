@@ -1,6 +1,0 @@
-{
-  "printWidth": 100,
-  "tslintIntegration": true,
-  "eslintIntegration": true,
-  "stylelintIntegration": true
-}

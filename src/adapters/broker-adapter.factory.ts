@@ -7,15 +7,9 @@ export class BrokerFactory {
 
   private constructor() {}
 
-  public static getInstance(
-    options: NestBrokerOptions
-  ): BrokerAdapterInterface {
+  public static getInstance(options: NestBrokerOptions): BrokerAdapterInterface {
     if (!BrokerFactory.instance) {
-      BrokerFactory.instance = new RabbitMQAdapter(
-        options.url,
-        options.service,
-        options.logger
-      );
+      BrokerFactory.instance = new RabbitMQAdapter(options.url, options.service, options.logger);
     }
 
     return BrokerFactory.instance;

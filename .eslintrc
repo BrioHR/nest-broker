@@ -1,0 +1,3 @@
+{
+  "extends": ["@briohr/eslint-config-briohr-backend"]
+}

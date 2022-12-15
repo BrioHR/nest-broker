@@ -4,8 +4,8 @@ import { NEST_BROKER_OPTIONS } from "./constants";
 import { NestBrokerOptions } from "./interfaces";
 
 interface INestBrokerService {
-  publish(topic: string, content: {}): Promise<any>;
-  subscribe(topic: string, prefetch: number, callback: () => void): Promise<any>;
+  publish(topic: string, content: {}): Promise<void>;
+  subscribe(topic: string, prefetch: number, callback: () => void): Promise<void>;
 }
 
 @Injectable()
@@ -16,11 +16,7 @@ export class NestBrokerService implements INestBrokerService {
     return BrokerFactory.getInstance(this._NestBrokerOptions).publish(topic, content);
   }
 
-  public async subscribe(
-    topic: string,
-    prefetch: number,
-    callback: (message: string) => void
-  ): Promise<any> {
+  public async subscribe(topic: string, prefetch: number, callback: (message: string) => void): Promise<any> {
     return BrokerFactory.getInstance(this._NestBrokerOptions).subscribe(topic, prefetch, callback);
   }
 }

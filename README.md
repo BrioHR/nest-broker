@@ -71,7 +71,7 @@ The publish method produce a message in the specified topic.
 
 ## Decorator
 
-#### @Subscribe(topic: string)
+#### @Subscribe(topic: string, prefetch = 0)
 
 Used to register and subscribe a service method to a specified topic. **Only on NestJS services methods.**
 
@@ -134,6 +134,8 @@ The `NestBrokerModule` takes an `options` object:
 When you publish a message, it is sent to a fanout exchange.
 
 In the background, this module use the `service` option to create specific queues for each consumers. And bind them to the exchange.
+
+The prefetch option in the subscriber decorator is to allow RabbitMQ consume multiples messages at the same time.
 
 #### Informations about Apache Kafka implementation
 

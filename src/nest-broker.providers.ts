@@ -5,7 +5,7 @@ export const createNestBrokerProviders = (options: NestBrokerOptions) => {
   return [
     {
       provide: NEST_BROKER_OPTIONS,
-      useValue: options,
-    },
+      useValue: options
+    }
   ];
 };
