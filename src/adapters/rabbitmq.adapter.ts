@@ -53,7 +53,7 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
           channel.consume(queue, async msg => {
             this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
             if (msg !== null) {
-              if (callback["contructor"] === "AsyncFunction") {
+              if (callback["constructor"]["name"] === "AsyncFunction") {
                 (callback(JSON.parse(msg.content.toString())) as Promise<void>).then(() => channel.ack(msg)).catch(() => channel.reject());
               } else {
                 try {
