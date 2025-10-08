@@ -8,8 +8,8 @@
     "target": "es6",
     "sourceMap": false,
     "outDir": "./dist",
-    "rootDir": "./src",
     "baseUrl": "./",
+    "rootDir": "./src",
     "noLib": false,
     "noImplicitAny": false,
     "skipLibCheck": true
