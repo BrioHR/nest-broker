@@ -35,13 +35,21 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
     );
   }
 
-  public async subscribe(topic: string, prefetch: number, callback: (message: string) => void | Promise<void>): Promise<void> {
+  public async subscribe(
+    topic: string, 
+    prefetch: number, 
+    callback: (message: string) => void | Promise<void>,
+    options?: { ackEarly?: boolean; timeout?: number }
+  ): Promise<void> {
     const exchange = topic;
     const queue = `${this.service}_${topic}`;
+    const ackEarly = options?.ackEarly ?? false;
+    const timeout = options?.timeout ?? 30000;
+    
     if (!prefetch) {
       prefetch = 0;
     }
-
+    
     this.connection.createChannel({
       json: true,
       setup: channel => {
@@ -50,21 +58,46 @@ export class RabbitMQAdapter implements BrokerAdapterInterface {
           channel.assertExchange(exchange, "fanout"),
           channel.prefetch(prefetch),
           channel.bindQueue(queue, exchange),
-          channel.consume(queue, async msg => {
-            this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
-            if (msg !== null) {
-              if (callback["constructor"]["name"] === "AsyncFunction") {
-                (callback(JSON.parse(msg.content.toString())) as Promise<void>).then(() => channel.ack(msg)).catch(() => channel.reject());
-              } else {
-                try {
-                  callback(JSON.parse(msg.content.toString()));
+          channel.consume(
+            queue, 
+            async msg => {
+              this.logger.log(`Consume ${queue} ${msg.content.toString()}`);
+              
+              if (msg !== null) {
+                // Ack early if configured
+                if (ackEarly) {
                   channel.ack(msg);
+                }
+                
+                try {
+                  const parsedMessage = JSON.parse(msg.content.toString());
+                  
+                  if (callback["constructor"]["name"] === "AsyncFunction") {
+                    await callback(parsedMessage);
+                  } else {
+                    callback(parsedMessage);
+                  }
+                  
+                  // Ack after processing if not early ack
+                  if (!ackEarly) {
+                    channel.ack(msg);
+                  }
+                  
+                  this.logger.log(`Successfully processed message from ${queue}`);
                 } catch (e) {
-                  channel.reject();
+                  this.logger.error(`Error processing message from ${queue}: ${e.message}`, e.stack);
+                  
+                  // Only reject if we haven't already acked
+                  if (!ackEarly && msg && msg.fields && msg.fields.deliveryTag) {
+                    channel.reject(msg, false);
+                  }
                 }
               }
+            },
+            {
+              consumerTimeout: timeout
             }
-          })
+          )
         ]).catch(e => this.logger.error(e));
       }
     });
