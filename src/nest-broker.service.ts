@@ -16,7 +16,12 @@ export class NestBrokerService implements INestBrokerService {
     return BrokerFactory.getInstance(this._NestBrokerOptions).publish(topic, content);
   }
 
-  public async subscribe(topic: string, prefetch: number, callback: (message: string) => void): Promise<any> {
-    return BrokerFactory.getInstance(this._NestBrokerOptions).subscribe(topic, prefetch, callback);
+  public async subscribe(
+    topic: string,
+    prefetch: number,
+    callback: (message: string) => void,
+    options?: { ackEarly?: boolean; timeout?: number }
+  ): Promise<any> {
+    return BrokerFactory.getInstance(this._NestBrokerOptions).subscribe(topic, prefetch, callback, options);
   }
 }

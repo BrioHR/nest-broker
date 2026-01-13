@@ -2,11 +2,12 @@ import { SetMetadata } from "@nestjs/common";
 import { BROKER_SUBSCRIBE } from "../constants";
 import { DecoratorMetadataConfiguration } from "../interfaces/decorator-metadata-configuration.interface";
 
-export const Subscribe = (topic: string, prefetch: number = 0) => {
+export const Subscribe = (topic: string, prefetch: number = 0, options?: { ackEarly?: boolean; timeout?: number }) => {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     SetMetadata<string, DecoratorMetadataConfiguration>(BROKER_SUBSCRIBE, {
       topic,
       prefetch,
+      options,
       target: target.constructor.name,
       methodName: propertyKey,
       callback: descriptor.value

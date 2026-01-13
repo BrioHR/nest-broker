@@ -4,4 +4,5 @@ export interface DecoratorMetadataConfiguration {
   target: string;
   methodName: string;
   callback: () => void;
+  options?: { ackEarly?: boolean; timeout?: number };
 }
